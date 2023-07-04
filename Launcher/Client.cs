@@ -97,7 +97,7 @@ namespace TaskScheduler.Launcher
             List<TaskDTO>? tasks = taskLogic.GetAllTasks();
 
             Console.Clear();
-            var tableHeader = string.Format($"|{"id",-4}|{"Name",-20}|{"Type",-10}|{"Due Date",-11}|{"Status",-15}|{"Notes",-40}|");
+            var tableHeader = string.Format($"|{"Id",-4}|{"Name",-28}|{"Type",-15}|{"Due Date",-11}|{"Status",-15}|{"Notes",-40}|");
             if (tasks.Count == 0)
             {
                 Console.WriteLine("There is no task at the moment");
@@ -106,7 +106,7 @@ namespace TaskScheduler.Launcher
             {
                 Console.WriteLine(tableHeader);
                 string dash = "";
-                for (int i = 0; i < 107; i++)
+                for (int i = 0; i < 120; i++)
                 {
                     dash += "-";
                 }
@@ -114,8 +114,36 @@ namespace TaskScheduler.Launcher
                 for (int i = 0; i < tasks.Count; i++)
                 {
                     string dueDate = tasks[i].Due.HasValue ? tasks[i].Due.Value.ToString("yyyy/MM/dd") : "";
-                    string taskOutput = string.Format($"|{i + 1,-4}|{tasks[i].Name,-20}|{tasks[i].Type,-10}|{dueDate,-11}|{tasks[i].Status,-15}|{tasks[i].Notes,-40}|");
-                    Console.WriteLine(taskOutput);
+                    string taskOutput = string.Format($"|{i + 1,-4}|{tasks[i].Name,-28}|{tasks[i].Type,-15}|{dueDate,-11}|{tasks[i].Status,-15}|{tasks[i].Notes,-40}|");
+                    if (tasks[i].Status.Equals("done", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine(taskOutput);
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    else if ((tasks[i].Due < DateTime.Today))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine(taskOutput);
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    else if ((tasks[i].Due == DateTime.Today))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.WriteLine(taskOutput);
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
+                    else if (tasks[i].Due <= DateTime.Today.AddDays(2))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine(taskOutput);
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    } 
+                    else
+                    {
+                        Console.WriteLine(taskOutput);
+                    }
+                   
                 }
 
                 Console.WriteLine(dash);
@@ -131,22 +159,28 @@ namespace TaskScheduler.Launcher
             {
                 retry = false;
                 Console.Clear();
-                Console.WriteLine("Please enter your task name");
+                Console.WriteLine("Please enter your task name or enter 'q' to go back to main menu");
                 name = Console.ReadLine();
-                try
+                if (name.Equals("q", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    taskLogic.ValidateName(name);
-                    task.Name = name;
+                    MainMenu();
                 }
-                catch (ValidationException ex)
+                else
                 {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine("Press any key to retry...");
-                    Console.ReadKey();
-                    retry = true;
-                    continue;
+                    try
+                    {
+                        taskLogic.ValidateName(name);
+                        task.Name = name;
+                    }
+                    catch (ValidationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine("Press any key to retry...");
+                        Console.ReadKey();
+                        retry = true;
+                        continue;
+                    }
                 }
-
             } while (retry == true);
 
             do
@@ -220,7 +254,7 @@ namespace TaskScheduler.Launcher
                 }
             } while (retry == true);
             taskLogic.CreateTask(task);
-            Console.WriteLine("Task created");
+            Console.WriteLine($"Task '{task.Name}' created");
         }
 
         public void EditTaskMenu()
@@ -236,7 +270,7 @@ namespace TaskScheduler.Launcher
                 retry = false;
                 Console.Clear();
                 ViewTaskMenu();
-                Console.WriteLine("Please select task to edit");
+                Console.WriteLine("Please select task to edit or enter 'q' to go back to main menu");
                 string choiceStr = Console.ReadLine();
                 int choice;
                 if (int.TryParse(choiceStr, out choice))
@@ -401,7 +435,11 @@ namespace TaskScheduler.Launcher
                     } while (retry == true);
 
                     taskLogic.UpdateTask(newTask);
-                    Console.WriteLine("Task edited");
+                    Console.WriteLine($"Task: '{newTask.Name}' edited");
+                }
+                else if (choiceStr.Equals("q", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    MainMenu();
                 }
                 else
                 {
@@ -422,7 +460,7 @@ namespace TaskScheduler.Launcher
                 retry = false;
                 Console.Clear();
                 ViewTaskMenu();
-                Console.WriteLine("Please select task to delete");
+                Console.WriteLine("Please select task to delete or enter 'q' to go back to main menu");
                 string choiceStr = Console.ReadLine();
                 int choice;
                 if (int.TryParse(choiceStr, out choice))
@@ -436,7 +474,7 @@ namespace TaskScheduler.Launcher
                             Console.ReadLine().Equals("yes", StringComparison.InvariantCultureIgnoreCase))
                         {
                             taskLogic.DeleteTask(task);
-                            Console.WriteLine("Task deleted");
+                            Console.WriteLine($"Task '{task.Name}' deleted");
                         }
                         else if (Console.ReadLine().Equals("n", StringComparison.InvariantCultureIgnoreCase) ||
                             Console.ReadLine().Equals("no", StringComparison.InvariantCultureIgnoreCase))
@@ -449,6 +487,10 @@ namespace TaskScheduler.Launcher
                             retry = true; //force to loop to prompt user again
                         }
                     } while (retry == true);
+                }
+                else if (choiceStr.Equals("q", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    MainMenu();
                 }
                 else
                 {

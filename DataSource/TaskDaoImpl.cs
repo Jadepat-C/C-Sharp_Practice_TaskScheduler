@@ -80,7 +80,7 @@ namespace TaskScheduler.DataSource
                 {
                     queryString = "SELECT id, name, type, due, status, notes " +
                                   "FROM [task] " +
-                                  "ORDER BY status, due";
+                                  "ORDER BY status DESC, due ASC";
                     SqlCommand command = new SqlCommand(queryString, conn);
 
                     conn.Open();
