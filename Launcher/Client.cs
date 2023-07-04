@@ -97,7 +97,7 @@ namespace TaskScheduler.Launcher
             List<TaskDTO>? tasks = taskLogic.GetAllTasks();
 
             Console.Clear();
-            var tableHeader = string.Format($"|{"Id",-4}|{"Name",-28}|{"Type",-15}|{"Due Date",-11}|{"Status",-15}|{"Notes",-40}|");
+            var tableHeader = string.Format($"|{"Id",-4}|{"Name",-30}|{"Type",-15}|{"Due Date",-11}|{"Status",-15}|{"Notes",-35}|");
             if (tasks.Count == 0)
             {
                 Console.WriteLine("There is no task at the moment");
@@ -106,7 +106,7 @@ namespace TaskScheduler.Launcher
             {
                 Console.WriteLine(tableHeader);
                 string dash = "";
-                for (int i = 0; i < 120; i++)
+                for (int i = 0; i < 117; i++)
                 {
                     dash += "-";
                 }
@@ -114,7 +114,7 @@ namespace TaskScheduler.Launcher
                 for (int i = 0; i < tasks.Count; i++)
                 {
                     string dueDate = tasks[i].Due.HasValue ? tasks[i].Due.Value.ToString("yyyy/MM/dd") : "";
-                    string taskOutput = string.Format($"|{i + 1,-4}|{tasks[i].Name,-28}|{tasks[i].Type,-15}|{dueDate,-11}|{tasks[i].Status,-15}|{tasks[i].Notes,-40}|");
+                    string taskOutput = string.Format($"|{i + 1,-4}|{tasks[i].Name,-30}|{tasks[i].Type,-15}|{dueDate,-11}|{tasks[i].Status,-15}|{tasks[i].Notes,-35}|");
                     if (tasks[i].Status.Equals("done", StringComparison.InvariantCultureIgnoreCase))
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
